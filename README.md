@@ -17,6 +17,7 @@ an eye on infrastructure health.
   - Uptime percentage per target
   - Recent check history
 - Auto-refreshing dashboard, no manual page reloads needed
+ ![Dashboard Screenshot](dashboard-screenshot.png.PNG)
 
 ## Tech Stack
 
