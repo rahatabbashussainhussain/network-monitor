@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Network Monitor Dashboard</title>
+    <meta http-equiv="refresh" content="30">
+    <style>
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+            background: #0f1117;
+            color: #e6e6e6;
+            margin: 0;
+            padding: 2rem;
+        }
+        h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+        .subtitle { color: #8a8f98; margin-bottom: 2rem; font-size: 0.9rem; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        .card {
+            background: #1a1d27;
+            border-radius: 10px;
+            padding: 1.2rem;
+            border-left: 4px solid #333;
+        }
+        .card.up { border-left-color: #2ecc71; }
+        .card.down { border-left-color: #e74c3c; }
+        .card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+        .status-badge {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-badge.up { background: rgba(46,204,113,0.15); color: #2ecc71; }
+        .status-badge.down { background: rgba(231,76,60,0.15); color: #e74c3c; }
+        .meta { color: #8a8f98; font-size: 0.8rem; margin-top: 0.4rem; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1a1d27;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.7rem 1rem;
+            border-bottom: 1px solid #2a2d38;
+            font-size: 0.9rem;
+        }
+        th { color: #8a8f98; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+        section h2 { font-size: 1.1rem; margin-top: 2.5rem; }
+    </style>
+</head>
+<body>
+    <h1>Network &amp; Service Monitor</h1>
+    <p class="subtitle">Last updated: {{ generated_at }} &middot; auto-refreshes every 30s</p>
+
+    <div class="grid">
+        {% for item in latest %}
+        <div class="card {{ 'up' if item['status'] == 'UP' else 'down' }}">
+            <h3>{{ item['name'] }}</h3>
+            <span class="status-badge {{ 'up' if item['status'] == 'UP' else 'down' }}">{{ item['status'] }}</span>
+            <div class="meta">
+                {{ item['target'] }}<br>
+                {% if item['response_time_ms'] %}{{ item['response_time_ms'] }} ms &middot; {% endif %}
+                checked {{ item['checked_at'] }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <section>
+        <h2>Uptime Summary</h2>
+        <table>
+            <tr><th>Service</th><th>Total Checks</th><th>Uptime %</th></tr>
+            {% for stat in uptime_stats %}
+            <tr>
+                <td>{{ stat['name'] }}</td>
+                <td>{{ stat['total_checks'] }}</td>
+                <td>{{ stat['uptime_pct'] }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+
+    <section>
+        <h2>Recent Check History</h2>
+        <table>
+            <tr><th>Service</th><th>Status</th><th>Response Time</th><th>Checked At</th></tr>
+            {% for row in history %}
+            <tr>
+                <td>{{ row['name'] }}</td>
+                <td>{{ row['status'] }}</td>
+                <td>{{ row['response_time_ms'] or '-' }} ms</td>
+                <td>{{ row['checked_at'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </section>
+</body>
+</html>
